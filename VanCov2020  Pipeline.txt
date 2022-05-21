@@ -3,7 +3,7 @@ bwa mem -t 10 /path/to/host/reference/genome/hg38.fullAnalysisSet.fa ../02-prepr
 samtools view -b {sample_id}/{sample_id}.sam > {sample_id}/{sample_id}.bam
 samtools sort -o {sample_id}/{sample_id}_sorted.bam -O bam -T {sample_id}/{sample_id} {sample_id}/{sample_id}.bam
 samtools index {sample_id}/{sample_id}_sorted.bam
-########## extracting unaligned reads from the BAM file
+########## Extracting unaligned reads from the BAM file
 samtools sort -@ 8 <human.sam> -o <human.bam> -O BAM
 samtools view -u -f 4 -F264<human.bam>
 > temp1.bam
@@ -31,36 +31,35 @@ seqtk seq -aQ64 -q20 -n N
 <consensus.fq> > <consensus.fasta>
 U <unmapped.fq> -S <covid.sam> -p 16 -
 -dta-cufflinks --summary-file <unmapped.log>
-#### varriant call/samtools
+#### Variant call/samtools
 samtools mpileup -uf
 <covid_reference_genome> <covid.bam> |
 bcftools call -cv -Ob > <variant.bcf>
 bcftools view <variant.bcf> >
 <variant.vcf>
 
-##### varriant call/varscan
+##### Variant call/varscan
 samtools mpileup -f
 <covid_reference_genome> <covid.bam> >
 <covid.pileup>
 java -jar VarScan.v2.4.4.jar
 mpileup2cns <covid.pileup> --outputvcf 1 --variants><covid.vcf>
-#### varriant annotation
+#### Variant annotation
 snpEff sars-cov-2 ../06-variant_calling/${sample_id}.vcf > ${sample_id}.ann.vcf
 ###### De Novo assembly of the viral reference genome/Spades
 python spades.py -t <8> -s
 <unmapped.fq> -o
 <spades_output_folder>
-###### de novo assembly of the viral ref geno/Megahit
+###### De novo assembly of the viral ref geno/Megahit
 ./megahit -r <unmapped.fq> -o
 <denovo_covid_genome>
 ##### De novo Assembly/Unicycler
 unicycler -t 10 -o {sample_id} -1 ../02-preprocessing/{sample_id}/{sample_id}_R1_filtered.fastq.gz -2 ../02-preprocessing/{sample_id}/{sample_id}_R2_filtered.fastq.gz
 #####Contig ordering and draft generation
 abacas.pl -r ../../../../REFERENCES/NC_045512.2.fasta -q ../../09-assembly/{sample_id}/{sample_id}/{sample_id}_scaffolds.fasta -m -p nucmer -o {sample_id}_abacas
-cd ..
 ####Alignement
 abacas.pl -r ../../../../REFERENCES/NC_045512.2.fasta -q ../../09-assembly/{sample_id}/{sample_id}/{sample_id}_scaffolds.fasta -m -p nucmer -o {sample_id}_abacas
-cd ..
+
 
 
 
